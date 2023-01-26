@@ -4,6 +4,29 @@
 # LC circuit with a sense resistor Rs (for measuring
 # current through LC circuit). 
 #
+# The magnitude and phase of the frequency response is
+# plotted. For the magnitude, the units are peak-to-peak
+# voltage Vout, for a user-specified input voltage Vin.
+# A line is plotted to indicate the measurement floor of
+# the oscilloscope for reference (Vlim). For example, set
+# Vlim = 0.5e-3 if the smallest vertical resolution is
+# 1mV/div.
+#
+# The script aids in the measurement of the frequency
+# response of the following circuit:
+#
+#      _____I ->_____
+#     |            __|__    LC resonant circuit, with R
+#     |           R     |   modelling resistance of inductor
+#    Vin          |     C   leads. Current I is controlled by 
+#     |           L     |   Vin, and measured indirectly across
+#     |            -----    Rs (the sense resistor)
+#     |              |
+#     |              Rs <--- Vout = V(Rs)
+#     |              |
+#      -----GND------
+#       
+#
 import matplotlib.pyplot as plt
 from matplotlib.ticker import StrMethodFormatter
 import numpy as np
@@ -22,7 +45,7 @@ Rs = 22
 Vin = 1
 
 # Set minimum measurement amplitude as 1mV
-Vlim = 1e-3
+Vlim = 0.5e-3
 
 print(f"L = {L} H, C = {C} F, Rs = {Rs} Ohms")
 fc = 1/(2*np.pi*np.sqrt(L*C))
