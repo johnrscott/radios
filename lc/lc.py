@@ -63,7 +63,10 @@ fc_bbc_somerset_kHz = 1566
 # Intermediate frequency
 f_if_kHz = 455
 
-# 
+# Measured data
+f_meas = [1,2,3,4,5,6,7,8,9,10,20,30,40,50,60,70,80,90,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1650,1700,1800,1900,2000,3000,4000,5000,6000,7000,8000,9000,10000,20000,30000,40000,50000,60000]
+vout_mag = [984,984,984,984,976,976,984,984,984,984,968,952,920,896,856,824,792,760,728,480,344,260,208,168,134,114,94,78,64,54,42,32.8,24.8,15.2,12.4,12,21,24,32,88.8,132,172,210,248,282,310,344,600,728,832,984,976]
+vout_angle = [2.16,-1.44,2.622,3.6,3.52,3.894,4.513,4.025,5.827,5.02,9.38,14.01,21.6,27,29.1,31.77,35.08,38.2,41.04,61.2,67.9,75.6,78.3,80.48,85.55,87.9,82.33,81.2,80.52,77.88,72,70,68,19,-51,-84,-68,-93,-92.36,-81.2,-75,-77.4,-71.14,-71.59,-68,-66,-67,-41.2,-36,-23.04,-16.4,-6.8]
 
 print(f"L = {L} H, C = {C} F, Rs = {Rs} Ohms")
 fc = 1/(2*np.pi*np.sqrt(L*C))
@@ -99,6 +102,7 @@ fig, axes = plt.subplots(2, 1, sharex = True)
 f_kHz = f/1e3
 fc_kHz = fc/1e3
 f_lo_kHz = fc_kHz - f_if_kHz
+f_image_kHz = f_lo_kHz + 2*f_if_kHz
 
 axes[0].axhline(y=Vin, color='black', linestyle='-', label = f"|Vin| = {Vin} V")
 axes[0].loglog(f_kHz, abs(Vout_with_R), label = f"|Vout|, R = {R} Ohms")
@@ -108,16 +112,18 @@ axes[0].grid(which="both")
 axes[0].xaxis.set_major_formatter(StrMethodFormatter("{x:.0f}"))
 axes[0].yaxis.set_major_formatter(StrMethodFormatter("{x:.0g}"))
 axes[0].axvspan(fc_kHz - bw_kHz/2, fc_kHz + bw_kHz/2,
-                alpha=0.7, color="blue", label = f"Tuned AM Channel, fc={fc_kHz:.0f} kHz")
+                alpha=0.1, color="blue", label = f"Tuned AM Channel, fc={fc_kHz:.0f} kHz")
 axes[0].axvline(x=f_if_kHz, color='black', linestyle='-',
                 label = f"Intermediate Frequency = {f_if_kHz} kHz")
 axes[0].axvline(x=f_lo_kHz, color='purple', linestyle='-',
                 label = f"Local Oscillator = {f_lo_kHz:.0f} kHz")
 axes[0].axvspan(fc_bbc_somerset_kHz - bw_kHz/2, fc_bbc_somerset_kHz + bw_kHz/2,
-                alpha=0.7, color="green",
+                alpha=0.1, color="green",
                 label = f"BBC Radio Somerset, fc = {fc_bbc_somerset_kHz:.0f} kHz")
 axes[0].fill_between(f_kHz, Vlim, facecolor='red',
-                     alpha=0.3, label = "Oscilloscope Measurement Limit")
+                     alpha=0.1, label = "Oscilloscope Measurement Limit")
+axes[0].axvspan(f_image_kHz - bw_kHz/2, f_image_kHz + bw_kHz/2,
+                alpha=0.1, color="red", label = f"Image AM Channel, fc={fc_kHz:.0f} kHz")
 axes[0].legend()
 
 scale = 360/(2*np.pi)
