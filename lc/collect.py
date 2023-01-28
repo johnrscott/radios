@@ -1,3 +1,6 @@
-import usbtmc as utmc
+import usbtmc as ut
 
-instr =  utmc.Instrument("1ab1", "04ce", 'DS1054z')
+dev = ut.Instrument(0x1ab1, 0x04ce)
+print(dev.ask("*IDN?"))
+
+dev.close()
