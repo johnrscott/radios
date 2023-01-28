@@ -2,6 +2,7 @@ from ds1054z import DS1054Z
 from fy6600 import FY6600
 from time import sleep
 import numpy as np
+import pandas as pd
 
 input_channel = 1
 output_channel = 2
@@ -13,7 +14,7 @@ osc.reset()
 osc.enable_channel(input_channel)
 osc.enable_channel(output_channel)
 
-freq = np.geomspace(1e3, 1e4, 11)
+freq = np.geomspace(1e3, 1e6, 11)
 print(freq)
 
 gen.set_amplitude(1.0)
@@ -36,7 +37,7 @@ def set_frequency(f):
     sleep(1)
     osc.reset_statistic_data()
 
-target_voltage = 1
+target_input_amplitude = 0.5
 gen_max_voltage = 5
 gen_min_voltage = 0
 
@@ -88,8 +89,17 @@ def set_input_amplitude(target):
     obtain the target output voltage
     '''
     
-    v_tol = 0.001
+    v_tol = 0.01
     max_iter = 20
+
+    # Make an amplitude measurement
+    # to test if any adjustment is needed
+    v_meas = input_amplitude()
+    if abs(v_meas - target) < v_tol:
+        print("No need for amplitude adjustment")
+        return 0
+    
+    print("Amplitude adjustment required")
     
     # Initial state
     v_upper = gen_max_voltage
@@ -103,10 +113,8 @@ def set_input_amplitude(target):
         if abs(v_meas - target) < v_tol:
             return v_try
         if v_meas > target:
-            print(f"{v_meas}, too high")
             v_upper = v_try
         else:
-            print(f"{v_meas}, too low")
             v_lower = v_try
         n += 1
 
@@ -114,20 +122,27 @@ def set_input_amplitude(target):
 
 set_frequency(1e3)
 v_in = set_input_amplitude(0.5)
-exit()
+print(v_in)
+
+v_gen = []
+v_in = []
+v_out = []
+phase_in_out = []
 
 for f in freq:
-
+    print(f"Measuring frequency {f} Hz")
     set_frequency(f)
-    sleep(5)
+    v_gen.append(set_input_amplitude(target_input_amplitude))
+    v_in.append(input_amplitude())
+    v_out.append(output_amplitude())
+    phase_in_out.append(phase_difference())
 
-    print(v_in)
-    exit()
-    
-    osc.average_vpp(1)
-    osc.average_vpp(2)
-    
-    
-exit()
+df = pd.DataFrame({
+    "f": freq,
+    "v_gen": v_gen,
+    "v_in": v_in,
+    "v_out": v_out,
+    "phase": phase_in_out
+})
 
-
+df.to_csv("meas.csv")
