@@ -41,17 +41,6 @@ class DS1054Z:
         self.dev.write(":SYSTEM:AUTOSCALE ON")
         self.wait_for_completion()
         
-    def set_channel(self, n, on):
-        '''
-        Turn a channel on or off, and set the vertical properties
-        of the channel. 
-        '''
-        if on:
-            self.dev.write(f":CHANNEL{n}:DISPLAY ON")
-        else:
-            self.dev.write(f":CHANNEL{n}:DISPLAY OFF")            
-        self.wait_for_completion()
-
     def reset_statistic_data(self):
         '''
         Clear the data being used to calculate a statistic,
