@@ -3,6 +3,7 @@ from fy6600 import FY6600
 from time import sleep
 
 gen = FY6600()
+gen.set_frequency(1, 1)
 exit()
 
 osc = DS1054Z()
