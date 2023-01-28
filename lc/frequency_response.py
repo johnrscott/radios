@@ -14,7 +14,7 @@ osc.reset()
 osc.enable_channel(input_channel)
 osc.enable_channel(output_channel)
 
-freq = np.geomspace(1e3, 1e7, 21)
+freq = np.geomspace(1e3, 1e7, 11)
 print(freq)
 
 gen.set_amplitude(1.0)
@@ -69,9 +69,14 @@ def phase_difference():
     Get the phase difference between the input and the
     output channels. The result is in degrees.
     '''
-    return osc.average_phase_difference(input_channel,
-                                        output_channel)
-
+    p1 = osc.average_phase_difference(input_channel,
+                                      output_channel)
+    p2 = osc.average_phase_difference(input_channel,
+                                      output_channel)
+    p3 = osc.average_phase_difference(input_channel,
+                                      output_channel)
+    return (p1 + p2 + p3) / 3
+    
 def set_gen_amplitude(v):
     '''
     Set the amplitude of the signal generator voltage to
@@ -142,6 +147,7 @@ for f in freq:
     v_in.append(input_amplitude())
     v_out.append(output_amplitude())
     phase_in_out.append(phase_difference())
+    print("")
 
 df = pd.DataFrame({
     "f": freq,
