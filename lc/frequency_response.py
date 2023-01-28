@@ -18,7 +18,7 @@ osc.enable_channel(input_channel)
 osc.enable_channel(output_channel)
 osc.set_trigger(input_channel, 0.0)
 
-freq = np.geomspace(1e3, 1e7, 11)
+freq = np.geomspace(1e3, 1e8, 51)
 print(freq)
 
 gen.set_amplitude(1.0)
@@ -69,12 +69,13 @@ def phase_difference():
     Get the phase difference between the input and the
     output channels. The result is in degrees.
     '''
+    sleep(1)
     p1 = osc.average_phase_difference(input_channel,
                                       output_channel)
-    sleep(0.2)
+    sleep(1)
     p2 = osc.average_phase_difference(input_channel,
                                       output_channel)
-    sleep(0.2)
+    sleep(1)
     p3 = osc.average_phase_difference(input_channel,
                                       output_channel)
     return (p1 + p2 + p3) / 3
