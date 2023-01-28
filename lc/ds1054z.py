@@ -95,7 +95,16 @@ class DS1054Z:
             phase = float(self.dev.query(cmd))
         print(f"Obtained average phase = {phase} deg between channels {n1} and {n2}")
         return phase
-    
+
+    def set_timebase(self, seconds_per_div):
+        '''
+        Set the timebase of the oscilloscope. The timebase nearest to
+        the specified seconds per division is picked.
+        '''
+        print(f"Setting main timebase to {seconds_per_div} s/div")
+        self.dev.write(f":TIMEBASE:MAIN:SCALE {seconds_per_div}")
+        self.wait_for_completion()        
+        
     def wait_for_completion(self):
         self.dev.query("*OPC?")
     

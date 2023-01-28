@@ -17,11 +17,17 @@ gen.set_frequency(freq[0])
 osc.autoscale()
 
 for f in freq:
+
     gen.set_frequency(f)
-    sleep(1)
+    
+    period = 1/f
+    num_divs = 6
+    seconds_per_div = period/num_divs
+    osc.set_timebase(seconds_per_div)
     osc.reset_statistic_data()
-    sleep(3)
+    sleep(5)
     osc.average_vpp(1)
+    osc.average_vpp(2)
     osc.average_phase_difference(1,2)
     
     
