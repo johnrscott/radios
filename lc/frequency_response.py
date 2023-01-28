@@ -14,7 +14,7 @@ osc.reset()
 osc.enable_channel(input_channel)
 osc.enable_channel(output_channel)
 
-freq = np.geomspace(1e3, 1e6, 11)
+freq = np.geomspace(1e3, 1e7, 21)
 print(freq)
 
 gen.set_amplitude(1.0)
@@ -54,10 +54,16 @@ def output_amplitude():
     '''
     Get the amplitude of the output channel,
     the one connected to the output port of the
-    device under test. Result in volts.
+    device under test. An initial measurement is 
+    made, which is used to scale the axis appropriately for
+    a more accurate measurement. Result in volts.
     '''
+    v_meas = osc.average_vpp(output_channel) / 2
+    num_divs = 2
+    volts_per_div = v_meas / num_divs
+    osc.set_vertical_scale(output_channel, volts_per_div)
     return osc.average_vpp(output_channel) / 2
-
+    
 def phase_difference():
     '''
     Get the phase difference between the input and the
