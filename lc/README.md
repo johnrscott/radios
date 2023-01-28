@@ -1,16 +1,14 @@
 # Automatic frequency response measurement
 
-## Accessing a shell for testing usbtmc commands
+## Install the python library
 
-The `universal_usbtmc` python library provides a shell for accessing the usbtmc instrument.
+Install `visa` as follows
 
 ```bash
-# Install the universal usbtmc (USB test and measurement class) library
-python3 -m pip install universal_usbtmc
+python3 -m pip install pyvisa pyvisa-py
+```
 
-# Test the connection (plug the DS1054z in via usb first, and check /dev/usbtmc1 is present)
-usbtmc-shell /dev/usbtmc1
-``
+## Permissions problems accessing usbtmc device
 
 If you find permissions issues when attempting to run Create `/etc/udev/rules.d/usbtmc.rules` and add
 
@@ -37,11 +35,3 @@ ls -la /dev/ | grep usbtmc
 
 You should now be able to write to the device (assuming your user is a member of `usbtmc`).
 
-## Install the python library
-
-To use the usbtmc device in python, install `python-usbtmc`:
-
-```bash
-sudo apt install libusb-1.0-0
-python3 -m pip install python-usbtmc pyusb
-```

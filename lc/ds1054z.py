@@ -1,26 +1,28 @@
-import usbtmc as ut
+import pyvisa
 
 class DS1054Z:
     '''
     Rigol DS1054z oscilloscope connection. Use to set timebase, control vertical
     range, and make measurements of waveforms.
     '''
-    def __init__(self, vender_id, product_id):
+    def __init__(self):
         '''
         Create a new oscilloscope object
         '''
-        self.dev = ut.Instrument(vender_id, product_id)
-        id = self.dev.ask("*IDN?")
+        rm = pyvisa.ResourceManager()
+        self.dev = rm.open_resource(rm.list_resources()[0])
+        id = self.dev.query("*IDN?")
         print(f"Connected to '{id}'")
 
-    def set_channel(index, on):
+    def set_channel(self, n, on):
         '''
         Turn a channel on or off, and set the vertical properties
         of the channel
         '''
         if on:
-            id = self.dev.ask("*IDN?")
-        
+            self.dev.write(f":CHANNEL{n}:DISPLAY ON")
+        else:
+            self.dev.write(f":CHANNEL{n}:DISPLAY OFF")            
         
     def __del__(self):
         self.dev.close()        
