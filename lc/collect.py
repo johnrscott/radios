@@ -1,1 +1,3 @@
-from ds1054z import DS1054Z
+import usbtmc as utmc
+
+instr =  utmc.Instrument("1ab1", "04ce", 'DS1054z')
