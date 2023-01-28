@@ -60,19 +60,34 @@ class DS1054Z:
         self.dev.write(f":MEASURE:STATISTIC:RESET")
         self.wait_for_completion()
         
-    def read_average_vpp(self, n):
+    def average_vpp(self, n):
         '''
         Read the average peak-to-peak voltage on a channel
         '''
         # Wait until the command returns sensible numbers
         # (when the statistic is first turned on, it prints
         # ***** to the screen, and returns 9.9E37 here
+        cmd = f":MEASURE:STATISTIC:ITEM? AVERAGES,VPP,CHANNEL{n}"
         vpp = 9.9e37
         while abs(vpp) > 1e6:
-            vpp = float(self.dev.query(f":MEASURE:STATISTIC:ITEM? AVERAGES,VPP,CHANNEL{n}"))
+            vpp = float(self.dev.query(cmd))
         print(f"Obtained average Vpp = {vpp} V on channel {n}")
         return vpp
 
+    def average_phase_difference(self, n1, n2):
+        '''
+        Read the average peak-to-peak voltage on a channel
+        '''
+        # Wait until the command returns sensible numbers
+        # (when the statistic is first turned on, it prints
+        # ***** to the screen, and returns 9.9E37 here
+        cmd = f":MEASURE:STATISTIC:ITEM? AVERAGES,RPHASE,CHANNEL{n1},CHANNEL{n2}"
+        phase = 9.9e37
+        while abs(phase) > 1e6:
+            phase = float(self.dev.query(cmd))
+        print(f"Obtained average phase = {phase} deg between channels {n1} and {n2}")
+        return phase
+    
     def wait_for_completion(self):
         self.dev.query("*OPC?")
     
