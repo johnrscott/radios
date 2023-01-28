@@ -105,6 +105,17 @@ class DS1054Z:
         '''
         self.dev.write(f":CHANNEL{n}:SCALE {volts_per_div}")
         self.wait_for_completion()                
+
+    def set_trigger(self, n, level):
+        '''
+        Set the trigger source to channel n with a specified
+        trigger level. The type of triggering is set to rising
+        edge. The 
+        '''
+        self.dev.write(f":TRIGGER:EDGE:SOURCE CHANNEL{n}")
+        self.dev.write(f":TRIGGER:EDGE:SLOPE POSITIVE")
+        self.dev.write(f":TRIGGER:EDGE:LEVEL {level}")        
+        self.wait_for_completion()
         
     def wait_for_completion(self):
         self.dev.query("*OPC?")

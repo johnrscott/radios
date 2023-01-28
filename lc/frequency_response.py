@@ -7,12 +7,16 @@ import pandas as pd
 input_channel = 1
 output_channel = 2
 
-gen = FY6600()
+target_input_amplitude = 0.5
+gen_max_voltage = 5
+gen_min_voltage = 0
 
+gen = FY6600()
 osc = DS1054Z()
 osc.reset()
 osc.enable_channel(input_channel)
 osc.enable_channel(output_channel)
+osc.set_trigger(input_channel, 0.3)
 
 freq = np.geomspace(1e3, 1e7, 11)
 print(freq)
@@ -36,10 +40,6 @@ def set_frequency(f):
     osc.set_timebase(seconds_per_div)
     sleep(1)
     osc.reset_statistic_data()
-
-target_input_amplitude = 0.5
-gen_max_voltage = 5
-gen_min_voltage = 0
 
 def input_amplitude():
     '''
@@ -71,8 +71,10 @@ def phase_difference():
     '''
     p1 = osc.average_phase_difference(input_channel,
                                       output_channel)
+    sleep(0.2)
     p2 = osc.average_phase_difference(input_channel,
                                       output_channel)
+    sleep(0.2)
     p3 = osc.average_phase_difference(input_channel,
                                       output_channel)
     return (p1 + p2 + p3) / 3
