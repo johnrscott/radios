@@ -1,6 +1,19 @@
 import usbtmc as ut
 
-dev = ut.Instrument(0x1ab1, 0x04ce)
-print(dev.ask("*IDN?"))
+class DS1054Z:
+    '''
+    Rigol DS1054z oscilloscope connection. Use to set timebase, control vertical
+    range, and make measurements of waveforms.
+    '''
+    def __init__(self, vender_id, product_id):
+        '''
+        Create a new oscilloscope object
+        '''
+        self.dev = ut.Instrument(vender_id, product_id)
+        id = self.dev.ask("*IDN?")
+        print(f"Connected to '{id}'")
 
-dev.close()
+    def __del__(self):
+        self.dev.close()        
+        
+
