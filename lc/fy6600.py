@@ -26,7 +26,7 @@ class FY6600:
         # The argument is passed in Volts, formatted
         # as xx.xx (note 5 characters required)
         val = f"{v:05.2f}"
-        print(val)
+        print(f"Setting signal generator amplitude to {v} V")
         self.ser.write(f"WMA{val}\n".encode())
 
         
