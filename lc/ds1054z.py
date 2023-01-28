@@ -1,4 +1,23 @@
 import pyvisa
+import re
+
+def open_rigol_resource(rm):
+    '''
+    Search for the Rigol DS1054z oscilloscope in the VISA
+    resource list, and return the opened resource
+    '''
+    # Rigol DS1054z
+    vender_id = "6833"
+    product_id = "1230"
+
+    resources = rm.list_resources()
+    matches = [i for i, elem in enumerate(resources) if
+               re.search(vender_id, elem) and
+               re.search(product_id, elem)]
+    if len(matches) != 1:
+        raise RuntimeError("Unable to open connection to DS1054z")
+    else:
+        return rm.open_resource(resources[matches[0]])
 
 class DS1054Z:
     '''
@@ -10,7 +29,7 @@ class DS1054Z:
         Create a new oscilloscope object
         '''
         rm = pyvisa.ResourceManager()
-        self.dev = rm.open_resource(rm.list_resources()[0])
+        self.dev = open_rigol_resource(rm)
         id = self.dev.query("*IDN?")
         print(f"Connected to: {id}")
         self.dev.timeout = 100000
