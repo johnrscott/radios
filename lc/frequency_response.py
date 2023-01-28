@@ -2,10 +2,16 @@ from ds1054z import DS1054Z
 from time import sleep
 
 osc = DS1054Z()
+osc.reset()
+osc.unlock_autoscale()
+osc.autoscale()
 
-while True:
-    osc.set_channel(1, True)
-    sleep(1)
-    osc.set_channel(1, False)
-    sleep(1)
-    
+osc.read_average_vpp(1)
+sleep(2)
+osc.read_average_vpp(1)
+sleep(2)
+osc.read_average_vpp(1)
+sleep(2)
+osc.read_average_vpp(1)
+sleep(2)
+
