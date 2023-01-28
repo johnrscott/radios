@@ -10,16 +10,26 @@ class FY6600:
         # self.ser.write(b"RMA\n")
         # print(self.ser.readline())
 
-    def set_frequency(self, n, f):
+    def set_frequency(self, f):
         ''' 
         Set the frequency of channel n to f (in Hertz)
         '''
         # The argument is passed in micro-Hertz, padded
         # to a fourteen digit integer
-        f_uHz = f"{(f/1e-6):014.0f}"
-        print(f_uHz)
-        self.ser.write(f"WMF{f_uHz}\n".encode())
+        val = f"{(f/1e-6):014.0f}"
+        self.ser.write(f"WMF{val}\n".encode())
 
+    def set_amplitude(self, v):
+        ''' 
+        Set the amplitude of channel n to f (in Volts)
+        '''
+        # The argument is passed in Volts, formatted
+        # as xx.xx (note 5 characters required)
+        val = f"{v:05.2f}"
+        print(val)
+        self.ser.write(f"WMA{val}\n".encode())
+
+        
 
     def __del__(self):
         self.ser.close()
