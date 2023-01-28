@@ -7,14 +7,14 @@ gen = FY6600()
 
 osc = DS1054Z()
 osc.reset()
-osc.unlock_autoscale()
+osc.enable_channel(1)
+osc.enable_channel(2)
 
 freq = np.geomspace(1e3, 1e4, 11)
 print(freq)
 
 gen.set_amplitude(1.0)
 gen.set_frequency(freq[0])
-osc.autoscale()
 
 def set_frequency(f):
     '''
@@ -40,12 +40,17 @@ gen_min_voltage = 0
 def set_amplitude(v):
     '''
     Set the amplitude of the signal generator voltage to
-    v. In addition, the oscilloscope is autoscaled so that
-    the new amplitude fits on the screen
+    v. In addition, the oscilloscope channel 1 is measured,
+    and the signal is scaled to fit on two vertical divisions
     '''
     gen.set_amplitude(v)
-    osc.autoscale()
-
+    sleep(1)
+    v_meas = osc.average_vpp(1)
+    num_divs = 2
+    volts_per_div = v_meas/(2*num_divs)
+    osc.set_vertical_scale(1, volts_per_div)
+    
+    
 def adjust_voltage_to(target):
     '''
     Adjust the signal generator voltage
@@ -77,7 +82,11 @@ def adjust_voltage_to(target):
         n += 1
 
     raise RuntimeError(f"Voltage adjustment did not converge within {max_iter} iterations")
-        
+
+set_frequency(1e3)
+set_amplitude(1)
+exit()
+
 for f in freq:
 
     set_frequency(f)

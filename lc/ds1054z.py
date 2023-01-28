@@ -41,23 +41,16 @@ class DS1054Z:
         '''
         print("Resetting the device")
         self.dev.write("*RST")
-        #self.wait_for_completion()
-        
-    def autoscale(self):
-        '''
-        Autoscale the device. This will also turn
-        on channels that have signals present.
-        '''
-        print("Autoscaling device")
-        self.dev.write(":AUTOSCALE")
         self.wait_for_completion()
 
-    def unlock_autoscale(self):
+    def enable_channel(self, n):
         '''
-        Unlock the autoscale function on the device
+        Turn on the specified channel, set the vertical
+        scale to 0.2V/div and zero the vertical offset.
         '''
-        print("Unlocking the autoscale function")
-        self.dev.write(":SYSTEM:AUTOSCALE ON")
+        self.dev.write(f":CHANNEL{n}:DISPLAY ON")
+        self.set_vertical_scale(n, 0.2)
+        self.dev.write(f":CHANNEL{n}:OFFSET 0")
         self.wait_for_completion()
         
     def reset_statistic_data(self):
@@ -104,6 +97,14 @@ class DS1054Z:
         print(f"Setting main timebase to {seconds_per_div} s/div")
         self.dev.write(f":TIMEBASE:MAIN:SCALE {seconds_per_div}")
         self.wait_for_completion()        
+
+    def set_vertical_scale(self, n, volts_per_div):
+        '''
+        Set the vertical scale of channel n to the specified volts
+        per division (or the closest valid scale)
+        '''
+        self.dev.write(f":CHANNEL{n}:SCALE {volts_per_div}")
+        self.wait_for_completion()                
         
     def wait_for_completion(self):
         self.dev.query("*OPC?")
