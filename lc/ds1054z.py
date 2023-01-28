@@ -13,6 +13,15 @@ class DS1054Z:
         id = self.dev.ask("*IDN?")
         print(f"Connected to '{id}'")
 
+    def set_channel(index, on):
+        '''
+        Turn a channel on or off, and set the vertical properties
+        of the channel
+        '''
+        if on:
+            id = self.dev.ask("*IDN?")
+        
+        
     def __del__(self):
         self.dev.close()        
         
