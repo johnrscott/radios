@@ -1,7 +1,7 @@
 import serial
 
 class FY6600:
-    def __init__(self, device = "/dev/ttyUSB1"):
+    def __init__(self, device = "/dev/ttyUSB0"):
         '''
         Create a new FY6600 signal generator object.
         '''
