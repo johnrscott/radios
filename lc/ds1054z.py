@@ -51,12 +51,25 @@ class DS1054Z:
         else:
             self.dev.write(f":CHANNEL{n}:DISPLAY OFF")            
         self.wait_for_completion()
-            
+
+    def reset_statistic_data(self):
+        '''
+        Clear the data being used to calculate a statistic,
+        ready for a new statistic.
+        '''
+        self.dev.write(f":MEASURE:STATISTIC:RESET")
+        self.wait_for_completion()
+        
     def read_average_vpp(self, n):
         '''
         Read the average peak-to-peak voltage on a channel
         '''
-        vpp = self.dev.query(f":MEASURE:STATISTIC:ITEM? AVERAGES,VPP,CHANNEL{n}")
+        # Wait until the command returns sensible numbers
+        # (when the statistic is first turned on, it prints
+        # ***** to the screen, and returns 9.9E37 here
+        vpp = 9.9e37
+        while abs(vpp) > 1e6:
+            vpp = float(self.dev.query(f":MEASURE:STATISTIC:ITEM? AVERAGES,VPP,CHANNEL{n}"))
         print(f"Obtained average Vpp = {vpp} V on channel {n}")
         return vpp
 
