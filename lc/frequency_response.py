@@ -60,8 +60,8 @@ def adjust_voltage_to(target):
     returns the input voltage that was required to 
     obtain the target output voltage
     ''' 
-    v_tol = 0.01
-    max_iter = 5
+    v_tol = 0.001
+    max_iter = 10
     
     # Initial state
     v_upper = gen_max_voltage
@@ -71,7 +71,7 @@ def adjust_voltage_to(target):
     while n < max_iter:
         v_try = (v_lower + v_upper) / 2
         set_amplitude(v_try)
-        sleep(1)
+        sleep(0.1)
         v_meas = osc.average_vpp(1)
         if abs(v_meas - target) < v_tol:
             return v_try
@@ -84,7 +84,7 @@ def adjust_voltage_to(target):
     raise RuntimeError(f"Voltage adjustment did not converge within {max_iter} iterations")
 
 set_frequency(1e3)
-set_amplitude(1)
+v_in = adjust_voltage_to(1.0)
 exit()
 
 for f in freq:
@@ -92,7 +92,6 @@ for f in freq:
     set_frequency(f)
     sleep(5)
 
-    v_in = adjust_voltage_to(1.0)
     print(v_in)
     exit()
     
