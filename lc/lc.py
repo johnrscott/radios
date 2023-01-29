@@ -38,6 +38,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import StrMethodFormatter
 import numpy as np
 import pandas as pd
+from frequency_response import FrequencyResponse
 
 # Inductor with series resistance R
 L = 30e-6
@@ -64,6 +65,9 @@ fc_bbc_somerset_kHz = 1566
 # Intermediate frequency
 f_if_kHz = 455
 
+fr = FrequencyResponse(1e3, 1e6, 11)
+df = fr.run()
+
 # Measured data
 # f_meas_kHz = np.array([1,2,3,4,5,6,7,8,9,10,20,30,40,50,60,70,80,90,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1650,1700,1800,1900,2000,3000,4000,5000,6000,7000,8000,9000,10000,20000,30000,40000,50000,60000])
 # Vin_mag_V = 1.01
@@ -75,7 +79,7 @@ f_if_kHz = 455
 # Vout_angle_2 = np.array([-0.72,-1.428,1.622,2.160,2.520,3.021,3.529,5.176,4.532,6.480,10.80,16.26,18.72,23.40,26.95,32.68,34.04,39.50,40.88,58.76,68.11,71.28,78.20,80.25,80.52,86.20,85.97,82.08,78.19,81.15,77,74,67,-5,74,-46,-82,-97,-88,-77.6,-86,-81,-73.73,-70,-67,-68.04,-64,-47.56,-38.76,-24.60,-18,-8.6])
 # Vout_angle = (Vout_angle_1 + Vout_angle_2) / 2
 
-df = pd.read_csv("meas.csv")
+#df = pd.read_csv("meas.csv")
 f_meas_kHz = df["f"] / 1e3
 Vin_mag_V = 0.3
 Vout_mag_mV = df["v_out"] * 1e3
