@@ -46,21 +46,21 @@ class FrequencyResponse:
                  vin_amplitude, input_channel = 1,
                  output_channel = 2):
         self.gen = FY6600()
-        self.sco = DS1054Z()
+        self.osc = DS1054Z()
         self.input_channel = 1
         self.output_channel = 2
-        self.target_input_amplitude = 0.3
+        self.target_input_amplitude = vin_amplitude
         self.gen_max_voltage = 5
         self.gen_min_voltage = 0
         
         self.osc.reset()
-        self.osc.enable_channel(input_channel)
-        self.osc.enable_channel(output_channel)
-        self.osc.set_trigger(input_channel, 0.0)
+        self.osc.enable_channel(self.input_channel)
+        self.osc.enable_channel(self.output_channel)
+        self.osc.set_trigger(self.input_channel, 0.0)
         
         self.freq = np.geomspace(freq_low, freq_high, freq_steps)
         
-    def set_frequency(f):
+    def set_frequency(self,f):
         '''
         Set the frequency of the signal generator 
         to f, and update the timebase of the oscilloscope
@@ -77,7 +77,7 @@ class FrequencyResponse:
         sleep(0.5)
         self.osc.reset_statistic_data()
 
-    def update_vertical_scale(channel, volts_per_div):
+    def update_vertical_scale(self, channel, volts_per_div):
         '''
         Update the vertical scale on channel to v_scale,
         unless the current vertical scale is within 5%
@@ -88,7 +88,7 @@ class FrequencyResponse:
             self.osc.set_vertical_scale(channel, volts_per_div)
         return 
 
-    def auto_vertical_scale(channel, max_adjustments = 5):
+    def auto_vertical_scale(self, channel, max_adjustments = 5):
         '''
         Adjust the channel vertical scale to fit the signal
         on the middle four divisions. Raises a RuntimeError
@@ -108,7 +108,7 @@ class FrequencyResponse:
                 self.update_vertical_scale(channel, 2 * volts_per_div)
         raise RuntimeError("Reached maximum vertical adjustments")
 
-    def channel_amplitude(channel):
+    def channel_amplitude(self, channel):
         '''
         Make a measurement of the amplitude on a channel.
         The function also adjusts the vertical scale to 
@@ -118,16 +118,16 @@ class FrequencyResponse:
         self.auto_vertical_scale(channel)
         return self.osc.average_vpp(channel) / 2
 
-    def input_amplitude():
+    def input_amplitude(self):
         '''
         Get the amplitude of the input channel
         (the one connected to the signal generator),
         which is the input port to the device under
         test. Result in volts.
         '''
-        return self.channel_amplitude(input_channel)
+        return self.channel_amplitude(self.input_channel)
 
-    def output_amplitude():
+    def output_amplitude(self):
         '''
         Get the amplitude of the output channel,
         the one connected to the output port of the
@@ -135,9 +135,9 @@ class FrequencyResponse:
         made, which is used to scale the axis appropriately for
         a more accurate measurement. Result in volts.
         '''
-        return self.channel_amplitude(output_channel)    
+        return self.channel_amplitude(self.output_channel)    
 
-    def phase_difference(num_samples = 10):
+    def phase_difference(self, num_samples = 10):
         '''
         Get the phase difference between the input and the
         output channels. The result is in degrees. The
@@ -148,25 +148,25 @@ class FrequencyResponse:
 
         total = 0
         for n in range(num_samples):
-            total += self.osc.average_phase_difference(input_channel,
-                                                       output_channel)        
+            total += self.osc.average_phase_difference(self.input_channel,
+                                                       self.output_channel)        
             sleep(0.2)
         return total / num_samples
 
-    def set_gen_amplitude(v):
+    def set_gen_amplitude(self, v):
         '''
         Set the amplitude of the signal generator voltage to
         v. In addition, the oscilloscope channel 1 is measured,
         and the signal is scaled to fit on two vertical divisions.
         '''
         self.gen.set_amplitude(v)
-        self.auto_vertical_scale(input_channel)
+        self.auto_vertical_scale(self.input_channel)
         sleep(0.5)
         self.osc.reset_statistic_data()
         sleep(0.5)
         return
 
-    def set_input_amplitude(target):
+    def set_input_amplitude(self, target):
         '''
         Adjust the signal generator voltage
         to obtain the target voltage on the oscilloscope
@@ -188,13 +188,13 @@ class FrequencyResponse:
         print("Amplitude adjustment required")
 
         # Initial state
-        v_low = gen_min_voltage
-        v_high = gen_max_voltage
+        v_low = self.gen_min_voltage
+        v_high = self.gen_max_voltage
 
         for n in range(max_iter):
             v_mid = (v_low + v_high) / 2
             self.set_gen_amplitude(v_mid)
-            v_meas = input_amplitude()
+            v_meas = self.input_amplitude()
             print(f"n={n}, v_low={v_low}, v_mid={v_mid}, v_high={v_high}: v_meas={v_meas}")
             if abs(v_meas - target) < v_tol:
                 return v_mid
@@ -208,7 +208,7 @@ class FrequencyResponse:
     def run(self):
         '''
         Run the frequency sweep and return the frequency response 
-        data as a dataframe
+        data as a dataframe.
         '''
     
         v_gen = []
@@ -216,16 +216,16 @@ class FrequencyResponse:
         v_out = []
         phase_in_out = []
 
-        for f in freq:
+        for f in self.freq:
             print(f"Measuring frequency {f} Hz")
             self.set_frequency(f)
-            v_gen.append(self.set_input_amplitude(target_input_amplitude))
+            v_gen.append(self.set_input_amplitude(self.target_input_amplitude))
             v_in.append(self.input_amplitude())
             v_out.append(self.output_amplitude())
             phase_in_out.append(self.phase_difference())
 
         return pd.DataFrame({
-            "f": freq,
+            "f": self.freq,
             "v_gen": v_gen,
             "v_in": v_in,
             "v_out": v_out,

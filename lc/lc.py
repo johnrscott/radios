@@ -65,7 +65,7 @@ fc_bbc_somerset_kHz = 1566
 # Intermediate frequency
 f_if_kHz = 455
 
-fr = FrequencyResponse(1e3, 1e6, 11)
+fr = FrequencyResponse(1e3, 1e6, 11, Vin)
 df = fr.run()
 
 # Measured data
