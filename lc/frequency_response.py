@@ -18,7 +18,7 @@ osc.enable_channel(input_channel)
 osc.enable_channel(output_channel)
 osc.set_trigger(input_channel, 0.0)
 
-freq = np.geomspace(1e3, 1e8, 51)
+freq = np.geomspace(1e3, 6e7, 11)
 print(freq)
 
 gen.set_amplitude(1.0)

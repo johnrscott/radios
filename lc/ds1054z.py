@@ -1,5 +1,6 @@
 import pyvisa
 import re
+from time import sleep
 
 def open_rigol_resource(rm):
     '''
@@ -24,7 +25,7 @@ class DS1054Z:
     Rigol DS1054z oscilloscope connection. Use to set timebase, control vertical
     range, and make measurements of waveforms.
     '''
-    def __init__(self):
+    def __init__(self, timeout_seconds = 1):
         '''
         Create a new oscilloscope object
         '''
@@ -32,7 +33,7 @@ class DS1054Z:
         self.dev = open_rigol_resource(rm)
         id = self.dev.query("*IDN?")
         print(f"Connected to: {id}")
-        self.dev.timeout = 100000
+        self.dev.timeout = timeout_seconds * 1e3
         print(f"Set device timeout to {self.dev.timeout} ms")
 
     def reset(self):
@@ -42,6 +43,7 @@ class DS1054Z:
         print("Resetting the device")
         self.dev.write("*RST")
         self.wait_for_completion()
+            
 
     def enable_channel(self, n):
         '''
@@ -61,20 +63,26 @@ class DS1054Z:
         self.dev.write(f":MEASURE:STATISTIC:RESET")
         self.wait_for_completion()
         
-    def average_vpp(self, n):
+    def average_vpp(self, n, max_attempts = 3):
         '''
-        Read the average peak-to-peak voltage on a channel
+        Read the average peak-to-peak voltage on a channel. If
+        the measurement fails, make repeated attempts up to
+        max_attempts, separated by 1 second. RuntimeError is
+        raised if measured fails after max_attempts.
         '''
         # Wait until the command returns sensible numbers
         # (when the statistic is first turned on, it prints
-        # ***** to the screen, and returns 9.9E37 here
+        # ***** to the screen, and returns 9.9E37 here. The check
+        # for validity is whether vpp < 1e6 (1 MV)
         cmd = f":MEASURE:STATISTIC:ITEM? AVERAGES,VPP,CHANNEL{n}"
-        vpp = 9.9e37
-        while abs(vpp) > 1e6:
+        for n in range(max_attempts):
+            print(f"Reading Vpp, attempt {n}")
             vpp = float(self.dev.query(cmd))
-        print(f"Obtained average Vpp = {vpp} V on channel {n}")
-        return vpp
-
+            if abs(vpp) < 1e6:
+                return vpp
+            sleep(1)
+        raise RuntimeError("Reached maximum attempts while reading Vpp")
+    
     def average_phase_difference(self, n1, n2):
         '''
         Read the average peak-to-peak voltage on a channel
@@ -117,9 +125,25 @@ class DS1054Z:
         self.dev.write(f":TRIGGER:EDGE:LEVEL {level}")        
         self.wait_for_completion()
         
-    def wait_for_completion(self):
-        self.dev.query("*OPC?")
-    
+    def wait_for_completion(self, max_timeouts = 10):
+        '''
+        Wait for the completetion of a previous command, allowing
+        multiple timeouts to occur in the waiting command (*OPC?). 
+        By setting the number of timeouts, the maximum allowed time
+        can be controlled by the caller. If the maximum number of 
+        timeouts is reached, a runtime error is thrown.
+        '''
+        for n in range(max_timeouts):
+            try:
+                self.dev.query("*OPC?")
+                return
+            except pyvisa.errors.VisaIOError as e:
+                if e.error_code == pyvisa.constants.VI_ERROR_TMO:
+                    print(f"Got timeout {n}; trying again")
+                else:
+                    raise e
+        raise RuntimeError("Reached maximum timeouts waiting for completion")
+                
     def __del__(self):
         self.dev.close()        
         
