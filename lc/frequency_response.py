@@ -18,7 +18,7 @@ osc.enable_channel(input_channel)
 osc.enable_channel(output_channel)
 osc.set_trigger(input_channel, 0.0)
 
-freq = np.geomspace(1e3, 6e7, 11)
+freq = np.geomspace(1e3, 6e7, 101)
 print(freq)
 
 gen.set_amplitude(1.0)
@@ -38,7 +38,7 @@ def set_frequency(f):
     num_divs = 6
     seconds_per_div = period/num_divs
     osc.set_timebase(seconds_per_div)
-    sleep(1)
+    sleep(0.5)
     osc.reset_statistic_data()
 
 def update_vertical_scale(channel, volts_per_div):
@@ -101,22 +101,22 @@ def output_amplitude():
     '''
     return channel_amplitude(output_channel)    
     
-def phase_difference():
+def phase_difference(num_samples = 10):
     '''
     Get the phase difference between the input and the
-    output channels. The result is in degrees.
+    output channels. The result is in degrees. The
+    num_samples determines how many readings are taken
+    (separated by 0.2 seconds) and averaged (the average
+    phase measurement appears highly variable).
     '''
-    sleep(1)
-    p1 = osc.average_phase_difference(input_channel,
-                                      output_channel)
-    sleep(1)
-    p2 = osc.average_phase_difference(input_channel,
-                                      output_channel)
-    sleep(1)
-    p3 = osc.average_phase_difference(input_channel,
-                                      output_channel)
-    return (p1 + p2 + p3) / 3
-    
+
+    total = 0
+    for n in range(num_samples):
+        total += osc.average_phase_difference(input_channel,
+                                              output_channel)        
+        sleep(0.2)
+    return total / num_samples
+
 def set_gen_amplitude(v):
     '''
     Set the amplitude of the signal generator voltage to
@@ -127,7 +127,7 @@ def set_gen_amplitude(v):
     auto_vertical_scale(input_channel)
     sleep(0.5)
     osc.reset_statistic_data()
-    #sleep(0.5)    
+    sleep(0.5)
     return
 
 def set_input_amplitude(target):
@@ -139,7 +139,6 @@ def set_input_amplitude(target):
     returns the input voltage that was required to 
     obtain the target output voltage
     '''
-    
     v_tol = 0.01
     max_iter = 20
 
@@ -164,9 +163,9 @@ def set_input_amplitude(target):
         if abs(v_meas - target) < v_tol:
             return v_mid
         if v_meas > target:
-            v_high = v_mid #0.75 * v_mid + 0.25 * v_high
+            v_high = v_mid
         else:
-            v_low = v_mid #0.75 * v_mid + 0.25 * v_low
+            v_low = v_mid
 
     raise RuntimeError(f"Voltage adjustment did not converge within {max_iter} iterations")
 

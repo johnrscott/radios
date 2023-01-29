@@ -63,11 +63,11 @@ class DS1054Z:
         self.dev.write(f":MEASURE:STATISTIC:RESET")
         self.wait_for_completion()
         
-    def average_vpp(self, n, max_attempts = 3):
+    def average_vpp(self, n, max_attempts = 10):
         '''
         Read the average peak-to-peak voltage on a channel. If
         the measurement fails, make repeated attempts up to
-        max_attempts, separated by 1 second. RuntimeError is
+        max_attempts, separated by 0.1 second. RuntimeError is
         raised if measured fails after max_attempts.
         '''
         # Wait until the command returns sensible numbers
@@ -80,7 +80,7 @@ class DS1054Z:
             vpp = float(self.dev.query(cmd))
             if abs(vpp) < 1e6:
                 return vpp
-            sleep(1)
+            sleep(0.1)
         raise RuntimeError("Reached maximum attempts while reading Vpp")
     
     def average_phase_difference(self, n1, n2):
