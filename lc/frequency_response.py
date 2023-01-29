@@ -7,7 +7,7 @@ import pandas as pd
 input_channel = 1
 output_channel = 2
 
-target_input_amplitude = 0.5
+target_input_amplitude = 0.3
 gen_max_voltage = 5
 gen_min_voltage = 0
 
@@ -126,6 +126,8 @@ def set_gen_amplitude(v):
     gen.set_amplitude(v)
     auto_vertical_scale(input_channel)
     sleep(0.5)
+    osc.reset_statistic_data()
+    #sleep(0.5)    
     return
 
 def set_input_amplitude(target):
@@ -162,14 +164,14 @@ def set_input_amplitude(target):
         if abs(v_meas - target) < v_tol:
             return v_mid
         if v_meas > target:
-            v_high = v_mid
+            v_high = v_mid #0.75 * v_mid + 0.25 * v_high
         else:
-            v_low = v_mid
+            v_low = v_mid #0.75 * v_mid + 0.25 * v_low
 
     raise RuntimeError(f"Voltage adjustment did not converge within {max_iter} iterations")
 
 set_frequency(1e3)
-v_in = set_input_amplitude(0.5)
+v_in = set_input_amplitude(target_input_amplitude)
 print(v_in)
 
 

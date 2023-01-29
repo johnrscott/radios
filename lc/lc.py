@@ -50,7 +50,7 @@ C = 303e-12
 Rs = 22
 
 # Input voltage, peak-to-peak
-Vin = 0.5
+Vin = 0.3
 
 # Set minimum measurement amplitude as 1mV
 Vlim = 0.5e-3
@@ -77,7 +77,7 @@ f_if_kHz = 455
 
 df = pd.read_csv("meas.csv")
 f_meas_kHz = df["f"] / 1e3
-Vin_mag_V = 0.5
+Vin_mag_V = 0.3
 Vout_mag_mV = df["v_out"] * 1e3
 Vout_angle = df["phase"]
 
