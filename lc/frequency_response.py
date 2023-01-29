@@ -41,7 +41,18 @@ def set_frequency(f):
     sleep(1)
     osc.reset_statistic_data()
 
-def adjust_vertical_scale(channel, max_adjustments = 5):
+def update_vertical_scale(channel, volts_per_div):
+    '''
+    Update the vertical scale on channel to v_scale,
+    unless the current vertical scale is within 5%
+    of the requested value (in which case do nothing).
+    '''
+    current = osc.vertical_scale(channel)
+    if abs(current - volts_per_div) / current > 0.05:
+        osc.set_vertical_scale(channel, volts_per_div)
+    return 
+    
+def auto_vertical_scale(channel, max_adjustments = 5):
     '''
     Adjust the channel vertical scale to fit the signal
     on the middle four divisions. Raises a RuntimeError
@@ -53,12 +64,12 @@ def adjust_vertical_scale(channel, max_adjustments = 5):
             v_meas = osc.average_vpp(channel) / 2
             num_divs = 2
             volts_per_div = v_meas / num_divs
-            osc.set_vertical_scale(channel, volts_per_div)
+            update_vertical_scale(channel, volts_per_div)
             return
         except RuntimeError:
             print(f"Performing vertical adjustment {n}")
-            v_scale = osc.vertical_scale(channel)
-            osc.set_vertical_scale(channel, 2 * v_scale)
+            volts_per_div = osc.vertical_scale(channel)
+            update_vertical_scale(channel, 2 * volts_per_div)
     raise RuntimeError("Reached maximum vertical adjustments")
     
 def channel_amplitude(channel):
@@ -68,7 +79,7 @@ def channel_amplitude(channel):
     attempt to place the signal across the middle
     four divisions.
     '''
-    adjust_vertical_scale(channel)
+    auto_vertical_scale(channel)
     return osc.average_vpp(channel) / 2
     
 def input_amplitude():
@@ -113,7 +124,8 @@ def set_gen_amplitude(v):
     and the signal is scaled to fit on two vertical divisions.
     '''
     gen.set_amplitude(v)
-    adjust_vertical_scale(input_channel)
+    auto_vertical_scale(input_channel)
+    sleep(0.5)
     return
 
 def set_input_amplitude(target):
