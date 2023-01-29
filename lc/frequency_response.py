@@ -41,12 +41,12 @@ def set_frequency(f):
     sleep(1)
     osc.reset_statistic_data()
 
-def channel_amplitude(channel, max_adjustments = 5):
+def adjust_vertical_scale(channel, max_adjustments = 5):
     '''
-    Make a measurement of the amplitude on a channel.
-    The function also adjusts the vertical scale to 
-    attempt to place the signal across the middle
-    four divisions.
+    Adjust the channel vertical scale to fit the signal
+    on the middle four divisions. Raises a RuntimeError
+    if max_adjustments are made and the signal amplitude
+    cannot be read.
     '''
     for n in range(max_adjustments):
         try:
@@ -54,12 +54,22 @@ def channel_amplitude(channel, max_adjustments = 5):
             num_divs = 2
             volts_per_div = v_meas / num_divs
             osc.set_vertical_scale(channel, volts_per_div)
-            return osc.average_vpp(input_channel) / 2
+            return
         except RuntimeError:
             print(f"Performing vertical adjustment {n}")
             v_scale = osc.vertical_scale(channel)
             osc.set_vertical_scale(channel, 2 * v_scale)
-    raise RuntimeError("Reached maximum vertical adjustments")  
+    raise RuntimeError("Reached maximum vertical adjustments")
+    
+def channel_amplitude(channel):
+    '''
+    Make a measurement of the amplitude on a channel.
+    The function also adjusts the vertical scale to 
+    attempt to place the signal across the middle
+    four divisions.
+    '''
+    adjust_vertical_scale(channel)
+    return osc.average_vpp(channel) / 2
     
 def input_amplitude():
     '''
@@ -103,12 +113,9 @@ def set_gen_amplitude(v):
     and the signal is scaled to fit on two vertical divisions.
     '''
     gen.set_amplitude(v)
-    sleep(1)
-    v_meas = input_amplitude()
-    num_divs = 2
-    volts_per_div = v_meas / num_divs
-    osc.set_vertical_scale(input_channel, volts_per_div)
-    
+    adjust_vertical_scale(input_channel)
+    return
+
 def set_input_amplitude(target):
     '''
     Adjust the signal generator voltage
@@ -130,28 +137,24 @@ def set_input_amplitude(target):
         return 0
     
     print("Amplitude adjustment required")
-    
+
     # Initial state
-    v_upper = gen_max_voltage
-    v_lower = gen_min_voltage
-    n = 0
+    v_low = gen_min_voltage
+    v_high = gen_max_voltage
     
-    while n < max_iter:
-        v_try = (v_lower + v_upper) / 2
-        set_gen_amplitude(v_try)
+    for n in range(max_iter):
+        v_mid = (v_low + v_high) / 2
+        set_gen_amplitude(v_mid)
         v_meas = input_amplitude()
+        print(f"n={n}, v_low={v_low}, v_mid={v_mid}, v_high={v_high}: v_meas={v_meas}")
         if abs(v_meas - target) < v_tol:
-            return v_try
+            return v_mid
         if v_meas > target:
-            v_upper = v_try
+            v_high = v_mid
         else:
-            v_lower = v_try
-        n += 1
+            v_low = v_mid
 
     raise RuntimeError(f"Voltage adjustment did not converge within {max_iter} iterations")
-
-sleep(20)
-print(channel_amplitude(output_channel))
 
 set_frequency(1e3)
 v_in = set_input_amplitude(0.5)
