@@ -16,7 +16,7 @@ python3 lc.py
 
 The script will write an output file `meas.csv` containing the results of the measurements (there is an example in this folder). After obtaining this file, subsequent runs of the script will ask if you want to simply plot the data in `meas.csv` or rerun the experiment.
 
-Expect the script to take about 20 minutes with 100 frequency points.
+Expect the script to take about 30 minutes with 100 frequency points.
 
 ## Frequency response measurement
 
