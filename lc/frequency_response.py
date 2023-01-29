@@ -137,20 +137,22 @@ class FrequencyResponse:
         '''
         return self.channel_amplitude(self.output_channel)    
 
-    def phase_difference(self, num_samples = 10):
+    def phase_difference(self, num_samples = 10, delay = 0.75):
         '''
         Get the phase difference between the input and the
         output channels. The result is in degrees. The
         num_samples determines how many readings are taken
-        (separated by 0.2 seconds) and averaged (the average
+        (separated by delay seconds) and averaged (the average
         phase measurement appears highly variable).
         '''
-
+        # Reset the statistics and wait for average to stabilise
+        self.osc.reset_statistic_data()
+        sleep(5)        
         total = 0
         for n in range(num_samples):
             total += self.osc.average_phase_difference(self.input_channel,
                                                        self.output_channel)        
-            sleep(0.2)
+            sleep(0.75)
         return total / num_samples
 
     def set_gen_amplitude(self, v):
@@ -205,10 +207,11 @@ class FrequencyResponse:
 
         raise RuntimeError(f"Voltage adjustment did not converge within {max_iter} iterations")
 
-    def run(self):
+    def run(self, savefile = "meas.csv"):
         '''
         Run the frequency sweep and return the frequency response 
-        data as a dataframe.
+        data as a dataframe. The function also saves the file as
+        meas
         '''
     
         v_gen = []
@@ -216,18 +219,21 @@ class FrequencyResponse:
         v_out = []
         phase_in_out = []
 
-        for f in self.freq:
-            print(f"Measuring frequency {f} Hz")
+        for n, f in enumerate(self.freq):
+            print(f"Measuring frequency {f} Hz ({n}/{len(self.freq)})")
             self.set_frequency(f)
             v_gen.append(self.set_input_amplitude(self.target_input_amplitude))
             v_in.append(self.input_amplitude())
             v_out.append(self.output_amplitude())
             phase_in_out.append(self.phase_difference())
 
-        return pd.DataFrame({
+        df = pd.DataFrame({
             "f": self.freq,
             "v_gen": v_gen,
             "v_in": v_in,
             "v_out": v_out,
             "phase": phase_in_out
         })
+
+        df.to_csv(savefile)
+        return df
