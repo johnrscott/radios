@@ -41,6 +41,26 @@ def set_frequency(f):
     sleep(1)
     osc.reset_statistic_data()
 
+def channel_amplitude(channel, max_adjustments = 5):
+    '''
+    Make a measurement of the amplitude on a channel.
+    The function also adjusts the vertical scale to 
+    attempt to place the signal across the middle
+    four divisions.
+    '''
+    for n in range(max_adjustments):
+        try:
+            v_meas = osc.average_vpp(channel) / 2
+            num_divs = 2
+            volts_per_div = v_meas / num_divs
+            osc.set_vertical_scale(channel, volts_per_div)
+            return osc.average_vpp(input_channel) / 2
+        except RuntimeError:
+            print(f"Performing vertical adjustment {n}")
+            v_scale = osc.vertical_scale(channel)
+            osc.set_vertical_scale(channel, 2 * v_scale)
+    raise RuntimeError("Reached maximum vertical adjustments")  
+    
 def input_amplitude():
     '''
     Get the amplitude of the input channel
@@ -48,7 +68,7 @@ def input_amplitude():
     which is the input port to the device under
     test. Result in volts.
     '''
-    return osc.average_vpp(input_channel) / 2
+    return channel_amplitude(input_channel)
 
 def output_amplitude():
     '''
@@ -58,11 +78,7 @@ def output_amplitude():
     made, which is used to scale the axis appropriately for
     a more accurate measurement. Result in volts.
     '''
-    v_meas = osc.average_vpp(output_channel) / 2
-    num_divs = 2
-    volts_per_div = v_meas / num_divs
-    osc.set_vertical_scale(output_channel, volts_per_div)
-    return osc.average_vpp(output_channel) / 2
+    return channel_amplitude(output_channel)    
     
 def phase_difference():
     '''
@@ -134,9 +150,13 @@ def set_input_amplitude(target):
 
     raise RuntimeError(f"Voltage adjustment did not converge within {max_iter} iterations")
 
+sleep(20)
+print(channel_amplitude(output_channel))
+
 set_frequency(1e3)
 v_in = set_input_amplitude(0.5)
 print(v_in)
+
 
 v_gen = []
 v_in = []

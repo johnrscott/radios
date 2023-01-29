@@ -111,9 +111,19 @@ class DS1054Z:
         Set the vertical scale of channel n to the specified volts
         per division (or the closest valid scale)
         '''
+        print(f"Setting vertical scale {volts_per_div}")
         self.dev.write(f":CHANNEL{n}:SCALE {volts_per_div}")
         self.wait_for_completion()                
 
+    def vertical_scale(self, n):
+        '''
+        Set the vertical scale of channel n to the specified volts
+        per division (or the closest valid scale)
+        '''
+        v_scale = float(self.dev.query(f":CHANNEL{n}:SCALE?"))
+        print(f"Obtained vertical scale {v_scale}")
+        return v_scale
+        
     def set_trigger(self, n, level):
         '''
         Set the trigger source to channel n with a specified
