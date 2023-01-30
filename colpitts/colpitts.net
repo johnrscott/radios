@@ -1,25 +1,38 @@
 Colpitts Oscillator Simulation
 
+* Transistor model from https://physics.uncg.edu/hellen/spice_stuff.html
+.model 2N3904   NPN(Is=6.734f Xti=3 Eg=1.11 Vaf=74.03 Bf=416.4 Ne=1.259
++               Ise=6.734f Ikf=66.78m Xtb=1.5 Br=.7371 Nc=2 Isc=0 Ikr=0 Rc=1
++               Cjc=3.638p Mjc=.3085 Vjc=.75 Fc=.5 Cje=4.493p Mje=.2593 Vje=.75
++               Tr=239.5n Tf=301.2p Itf=.4 Vtf=4 Xtf=2 Rb=10)
+
 * Biasing network
-R1 1 2 10k
-R2 0 1 10k
+R1 1 2 8.3k
+R2 0 1 1.7k
 C3 0 1 10n
 
 * Common-base amplifier
-Q1 4 1 3
+Q1 4 1 3 2N3904
+R3 0 3 1k
 
-* LC resonant circuit
-C1 3 2 100n
-C2 4 3 100n
-L1 4 2 30u
+* LC resonant circuit (1111kHz)
+C1 3 2 330n
+C2 4 3 330n
+L1 4 2 124u
 
 * Output coupling
-C4 4 50.1u 
+C4 4 5 0.1u 
 
 * Load impedance
 RL 5 0 1M
 
 * Power supply
-Vcc 2 0 5
+Vcc 2 0 DC 10
 
-.tran 10m 1s
+.control
+tran 100u 100m
+run
+.endc
+
+.end
+
