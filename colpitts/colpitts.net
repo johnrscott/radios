@@ -9,7 +9,7 @@ Colpitts Oscillator Simulation
 * Biasing network
 R1 1 2 8.3k
 R2 0 1 1.7k
-C3 0 1 10n
+C3 0 1 0.1n
 
 * Common-base amplifier
 Q1 4 1 3 2N3904
