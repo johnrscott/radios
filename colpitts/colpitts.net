@@ -1,0 +1,25 @@
+Colpitts Oscillator Simulation
+
+* Biasing network
+R1 1 2 10k
+R2 0 1 10k
+C3 0 1 10n
+
+* Common-base amplifier
+Q1 4 1 3
+
+* LC resonant circuit
+C1 3 2 100n
+C2 4 3 100n
+L1 4 2 30u
+
+* Output coupling
+C4 4 50.1u 
+
+* Load impedance
+RL 5 0 1M
+
+* Power supply
+Vcc 2 0 5
+
+.tran 10m 1s
