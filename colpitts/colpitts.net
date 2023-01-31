@@ -6,13 +6,15 @@ Colpitts Oscillator Simulation
 +               Cjc=3.638p Mjc=.3085 Vjc=.75 Fc=.5 Cje=4.493p Mje=.2593 Vje=.75
 +               Tr=239.5n Tf=301.2p Itf=.4 Vtf=4 Xtf=2 Rb=10)
 
+.include 2n2219.lib
+
 * Biasing network
-R1 1 2 8.3k
-R2 0 1 1.7k
-C3 0 1 0.1n
+R1 1 2 560k
+R2 0 1 100k
+C3 0 1 0.1u
 
 * Common-base amplifier
-Q1 4 1 3 2N3904
+Q1 4 1 3 2N2219
 R3 0 3 1k
  
 * LC resonant circuit (1111kHz)
