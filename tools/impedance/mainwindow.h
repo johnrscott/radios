@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QGraphicsScene>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,7 +19,10 @@ public:
     void setName(const QString &name);
     QString name() const;
 
+    void draw_circle();
+
 private:
     Ui::MainWindow *ui;
+    QGraphicsScene *scene_;
 };
 #endif // MAINWINDOW_H
