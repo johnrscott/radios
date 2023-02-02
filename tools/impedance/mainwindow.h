@@ -19,7 +19,7 @@ public:
     void setName(const QString &name);
     QString name() const;
 
-    void draw_circle();
+    void draw_constant_resistance_circle(qreal resistance);
 
 private:
     Ui::MainWindow *ui;

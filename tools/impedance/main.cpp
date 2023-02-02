@@ -8,7 +8,10 @@ int main(int argc, char *argv[])
     MainWindow w;
 
     w.setName("John Scott");
-    w.draw_circle();
+
+    for (qreal resistance{0.1}; resistance < 100; resistance *= 1.414) {
+        w.draw_constant_resistance_circle(resistance);
+    }
     w.show();
     return a.exec();
 }

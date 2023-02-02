@@ -20,10 +20,15 @@ void MainWindow::setName(const QString & name)
     ui->lineEdit->setText(name);
 }
 
-void MainWindow::draw_circle()
+void MainWindow::draw_constant_resistance_circle(qreal resistance)
 {
-    scene_->addEllipse(-100, -100, 300, 60);
-
+    qreal centre_x{resistance/(resistance+1)};
+    qreal centre_y{0};
+    qreal radius{1/(resistance + 1)};
+    qreal x{centre_x - radius};
+    qreal y{centre_y - radius};
+    qreal length{2*radius};
+    scene_->addEllipse(700*x, 700*y, 700*length, 700*length);
 }
 
 QString MainWindow::name() const
