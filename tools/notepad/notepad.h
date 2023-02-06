@@ -15,7 +15,8 @@ public:
     Notepad(QWidget *parent = nullptr);
     ~Notepad();
 
-    void newDocument();
+private slots:
+    void on_actionnewDocument_triggered();
 
 private:
     Ui::Notepad *ui;

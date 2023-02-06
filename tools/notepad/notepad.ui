@@ -67,6 +67,11 @@
    <addaction name="menuExit"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionnewDocument">
+   <property name="text">
+    <string>newDocument</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

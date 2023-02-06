@@ -1,5 +1,6 @@
 #include "notepad.h"
 #include "ui_notepad.h"
+#include <QtDebug>
 
 Notepad::Notepad(QWidget *parent)
     : QMainWindow(parent)
@@ -8,14 +9,15 @@ Notepad::Notepad(QWidget *parent)
     ui->setupUi(this);
 }
 
-void Notepad::newDocument()
-{
-    currentFile.clear();
-    ui->textEdit->setText(QString());
-}
-
 Notepad::~Notepad()
 {
     delete ui;
 }
 
+
+void Notepad::on_actionnewDocument_triggered()
+{
+    qDebug() << "New document";
+    currentFile.clear();
+    ui->textEdit->setText(QString());
+}
