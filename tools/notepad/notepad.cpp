@@ -8,6 +8,12 @@ Notepad::Notepad(QWidget *parent)
     ui->setupUi(this);
 }
 
+void Notepad::newDocument()
+{
+    currentFile.clear();
+    ui->textEdit->setText(QString());
+}
+
 Notepad::~Notepad()
 {
     delete ui;

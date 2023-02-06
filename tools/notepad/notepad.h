@@ -15,7 +15,10 @@ public:
     Notepad(QWidget *parent = nullptr);
     ~Notepad();
 
+    void newDocument();
+
 private:
     Ui::Notepad *ui;
+    QString currentFile;
 };
 #endif // NOTEPAD_H
