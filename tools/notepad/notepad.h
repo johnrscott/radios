@@ -16,9 +16,12 @@ public:
     ~Notepad();
 
 private slots:
-    void on_actionNew_triggered();
-
-    void on_actionOpen_triggered();
+    void newDocument();
+    void openDocument();
+    void saveDocument();
+    void saveAs();
+    void print();
+    void selectFont();
 
 private:
     Ui::Notepad *ui;
