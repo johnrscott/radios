@@ -6,12 +6,15 @@ SchematicEditor::SchematicEditor(QWidget *parent)
     , ui_(new Ui::MainWindow)
 {
     ui_->setupUi(this);
+    connect(ui_->actionInsert, &QAction::triggered, this, &SchematicEditor::insert_component);
     ui_->graphicsView->setScene(&scene_);
-
-    scene_.addItem(&resistor_);
 }
 
 SchematicEditor::~SchematicEditor()
 {
     delete ui_;
+}
+
+void SchematicEditor::insert_component() {
+    scene_.addItem(&resistor_);
 }

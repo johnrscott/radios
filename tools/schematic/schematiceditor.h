@@ -17,6 +17,9 @@ public:
     SchematicEditor(QWidget *parent = nullptr);
     ~SchematicEditor();
 
+private slots:
+    void insert_component();
+
 private:
     Ui::MainWindow *ui_;
     QGraphicsScene scene_;
