@@ -1,6 +1,6 @@
 #include "resistor.h"
 
-Resistor::Resistor()
+Resistor::Resistor(QGraphicsItem *parent)
 {
-
+    setAcceptDrops(true);
 }

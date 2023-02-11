@@ -19,6 +19,7 @@ public:
 
 private slots:
     void insert_component();
+    void set_resistor_pos();
 
 private:
     Ui::MainWindow *ui_;
